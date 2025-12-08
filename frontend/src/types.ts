@@ -49,3 +49,14 @@ export interface GeneratedCard {
   front: string;
   back: string;
 }
+
+export type PracticePool = "due_recent" | "all" | "new_only";
+
+export interface PracticeCard {
+  id: number;
+  deck_id: number;
+  front: string;
+  back: string;
+  source_id?: number | null;
+  source_chunk_id?: number | null;
+}

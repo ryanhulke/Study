@@ -1,9 +1,10 @@
 // src/components/PracticeSession.tsx
 
-import React, { useState } from 'react';
-import type { PracticeCard } from '../api';
+import React, { useState } from "react";
+import type { PracticeCard } from "../types";
+import { RenderMath } from "./RenderMath";
 
-type Grade = 'again' | 'hard' | 'good' | 'easy';
+type Grade = "again" | "hard" | "good" | "easy";
 
 interface PracticeSessionProps {
   cards: PracticeCard[];
@@ -14,7 +15,7 @@ interface PracticeSessionProps {
 export const PracticeSession: React.FC<PracticeSessionProps> = ({
   cards,
   deckName,
-  onDone,
+  onDone
 }) => {
   const [queue, setQueue] = useState<PracticeCard[]>(cards);
   const [index, setIndex] = useState(0);
@@ -23,17 +24,17 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({
 
   if (queue.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8">
-        <h2 className="text-xl font-semibold mb-2">Practice finished</h2>
-        <p className="mb-4 text-gray-600">
-          You went through {seen} card{seen === 1 ? '' : 's'} in {deckName}.
+      <div className="card">
+        <h2>Practice finished</h2>
+        <p>
+          You went through <strong>{seen}</strong> card
+          {seen === 1 ? "" : "s"} in <strong>{deckName}</strong>.
         </p>
-        <button
-          onClick={onDone}
-          className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
-        >
-          Back
-        </button>
+        <div className="button-row" style={{ marginTop: "0.75rem" }}>
+          <button className="button" onClick={onDone}>
+            Back
+          </button>
+        </div>
       </div>
     );
   }
@@ -46,24 +47,20 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({
     setSeen((s) => s + 1);
 
     setQueue((prev) => {
-      const current = prev[index];
+      const next = [...prev];
+      const current = next[index];
+      next.splice(index, 1); // remove current
 
-      let nextQueue = [...prev];
-      // Remove current from its position
-      nextQueue.splice(index, 1);
-
-      if (grade === 'again') {
-        // Put it at the end of the queue to see it again this session
-        nextQueue.push(current);
+      if (grade === "again") {
+        // see it again later this session
+        next.push(current);
       }
-      // hard/good/easy just drop it from this session
 
-      return nextQueue;
+      return next;
     });
 
     setShowBack(false);
     setIndex((prevIdx) => {
-      // Stay at same index because we removed the current card
       if (index >= queue.length - 1) {
         return 0;
       }
@@ -72,69 +69,78 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="px-6 py-3 bg-slate-900 text-white text-sm rounded-t-lg">
-        <div className="flex justify-between items-center">
-          <span className="font-semibold">Practice - {deckName}</span>
-          <span className="text-xs text-slate-300">
-            This mode does not change your spaced repetition schedule.
-          </span>
+    <div className="card">
+      <h2>Practice - {deckName}</h2>
+      <p style={{ fontSize: "0.85rem", color: "#4b5563" }}>
+        Practice mode does <strong>not</strong> change your spaced repetition
+        schedule.
+      </p>
+
+      <div
+        style={{
+          border: "1px solid #d1d5db",
+          borderRadius: "0.5rem",
+          padding: "1rem",
+          backgroundColor: "#f9fafb",
+          marginTop: "0.75rem"
+        }}
+      >
+        <div style={{ marginBottom: "0.75rem", fontSize: "0.85rem" }}>
+          Card {seen + 1} of {seen + queue.length}
         </div>
+
+        <div>
+          <h3 style={{ marginTop: 0, marginBottom: "0.5rem" }}>Front</h3>
+          <RenderMath text={card.front} />
+        </div>
+
+        {showBack && (
+          <div style={{ marginTop: "0.75rem" }}>
+            <h3 style={{ marginTop: 0, marginBottom: "0.5rem" }}>Back</h3>
+            <RenderMath text={card.back} />
+          </div>
+        )}
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 rounded-b-lg">
-        <div className="w-full max-w-2xl bg-white rounded-xl shadow-md p-6">
-          <div className="text-sm text-gray-500 mb-2">
-            Card {seen + 1} of {seen + queue.length}
-          </div>
-          <div className="min-h-[120px] mb-6">
-            <div className="text-lg font-medium mb-2">Front</div>
-            <div className="whitespace-pre-wrap">{card.front}</div>
-
-            {showBack && (
-              <>
-                <div className="mt-6 text-lg font-medium mb-2">Back</div>
-                <div className="whitespace-pre-wrap">{card.back}</div>
-              </>
-            )}
-          </div>
-
-          {!showBack ? (
-            <button
-              onClick={handleShowAnswer}
-              className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
-            >
-              Show answer
-            </button>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => handleGrade('again')}
-                className="px-3 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 text-sm"
-              >
-                Again
-              </button>
-              <button
-                onClick={() => handleGrade('hard')}
-                className="px-3 py-2 rounded-md bg-orange-500 text-white hover:bg-orange-600 text-sm"
-              >
-                Hard
-              </button>
-              <button
-                onClick={() => handleGrade('good')}
-                className="px-3 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 text-sm"
-              >
-                Good
-              </button>
-              <button
-                onClick={() => handleGrade('easy')}
-                className="px-3 py-2 rounded-md bg-emerald-500 text-white hover:bg-emerald-600 text-sm"
-              >
-                Easy
-              </button>
-            </div>
-          )}
+      {!showBack ? (
+        <div className="button-row" style={{ marginTop: "0.75rem" }}>
+          <button className="button primary" onClick={handleShowAnswer}>
+            Show answer
+          </button>
         </div>
+      ) : (
+        <div className="button-row" style={{ marginTop: "0.75rem" }}>
+          <button
+            className="button small danger"
+            onClick={() => handleGrade("again")}
+          >
+            Again
+          </button>
+          <button
+            className="button small"
+            onClick={() => handleGrade("hard")}
+          >
+            Hard
+          </button>
+          <button
+            className="button small primary"
+            onClick={() => handleGrade("good")}
+          >
+            Good
+          </button>
+          <button
+            className="button small"
+            onClick={() => handleGrade("easy")}
+          >
+            Easy
+          </button>
+        </div>
+      )}
+
+      <div className="button-row" style={{ marginTop: "0.75rem" }}>
+        <button className="button" onClick={onDone}>
+          End practice
+        </button>
       </div>
     </div>
   );
