@@ -39,10 +39,7 @@ export const SourcesView: React.FC = () => {
   useEffect(() => {
     async function init() {
       try {
-        const [srcs, ds] = await Promise.all([
-          listSources(),
-          listDecks()
-        ]);
+        const [srcs, ds] = await Promise.all([listSources(), listDecks()]);
         setSources(srcs);
         setDecks(ds);
         if (ds.length > 0) {
@@ -165,10 +162,13 @@ export const SourcesView: React.FC = () => {
     const f = sourceFilter.toLowerCase();
     if (!f) return true;
     return (
-      s.title.toLowerCase().includes(f) ||
-      s.path.toLowerCase().includes(f)
+      s.title.toLowerCase().includes(f) || s.path.toLowerCase().includes(f)
     );
   });
+
+  const allChunksSelected =
+    chunks.length > 0 && selectedChunkIds.length === chunks.length;
+  const noChunksSelected = selectedChunkIds.length === 0;
 
   return (
     <div className="card">
@@ -186,14 +186,10 @@ export const SourcesView: React.FC = () => {
             {filteredSources.map((s) => (
               <div
                 key={s.id}
-                style={{
-                  padding: "0.35rem 0.5rem",
-                  borderRadius: "0.375rem",
-                  marginBottom: "0.25rem",
-                  cursor: "pointer",
-                  backgroundColor:
-                    s.id === selectedSourceId ? "#1f2937" : "transparent"
-                }}
+                className={
+                  "source-item" +
+                  (s.id === selectedSourceId ? " source-item-selected" : "")
+                }
                 onClick={() => loadSourceChunks(s.id)}
               >
                 <div style={{ fontSize: "0.9rem" }}>{s.title}</div>
@@ -223,38 +219,41 @@ export const SourcesView: React.FC = () => {
                 <button
                   className="button small"
                   onClick={selectAllChunks}
-                  disabled={!chunks.length}
+                  disabled={!chunks.length || allChunksSelected}
                 >
                   Select all chunks
                 </button>
                 <button
                   className="button small"
                   onClick={clearChunkSelection}
-                  disabled={!chunks.length}
+                  disabled={!chunks.length || noChunksSelected}
                 >
                   Clear selection
                 </button>
               </div>
 
-              <div className="list" style={{ border: "1px solid #1f2937", borderRadius: "0.5rem", padding: "0.5rem" }}>
+              <div
+                className="list"
+                style={{
+                  border: "1px solid #25252555",
+                  borderRadius: "0.5rem",
+                  padding: "0.5rem",
+                  
+                }}
+              >
                 {chunks.map((c) => {
                   const selected = selectedChunkIds.includes(c.id);
                   return (
                     <div
                       key={c.id}
-                      style={{
-                        borderRadius: "0.375rem",
-                        padding: "0.4rem 0.5rem",
-                        marginBottom: "0.35rem",
-                        backgroundColor: selected ? "#1f2937" : "#0f172a",
-                        border: "1px solid #1f2937",
-                        cursor: "pointer"
-                      }}
+                      className={
+                        "chunk-item" +
+                        (selected ? " chunk-item-selected" : " chunk-item-unselected")
+                      }
                       onClick={() => toggleChunk(c.id)}
                     >
                       <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>
-                        {c.loc}{" "}
-                        <span className="badge">{c.kind}</span>
+                        {c.loc} <span className="badge">{c.kind}</span>
                       </div>
                       <div
                         className="monospace-small"
@@ -278,7 +277,7 @@ export const SourcesView: React.FC = () => {
                 style={{
                   marginTop: "0.75rem",
                   paddingTop: "0.75rem",
-                  borderTop: "1px solid #1f2937"
+                  borderTop: "1px solid #333333ff"
                 }}
               >
                 <h4 style={{ marginTop: 0 }}>Generate flashcards</h4>
@@ -298,9 +297,7 @@ export const SourcesView: React.FC = () => {
                         value={selectedDeckId ?? ""}
                         onChange={(e) =>
                           setSelectedDeckId(
-                            e.target.value
-                              ? Number(e.target.value)
-                              : null
+                            e.target.value ? Number(e.target.value) : null
                           )
                         }
                       >
@@ -384,13 +381,13 @@ export const SourcesView: React.FC = () => {
                         <div
                           key={idx}
                           style={{
-                            border: "1px solid #1f2937",
+                            border: "1px solid #2e2e2eff",
                             borderRadius: "0.5rem",
                             padding: "0.5rem 0.6rem",
                             marginBottom: "0.35rem",
                             backgroundColor: g.selected
-                              ? "#1f2937"
-                              : "#0f172a"
+                              ? "#252525ff"
+                              : "#383838ff"
                           }}
                         >
                           <div

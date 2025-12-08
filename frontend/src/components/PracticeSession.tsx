@@ -78,10 +78,10 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({
 
       <div
         style={{
-          border: "1px solid #1f2937",
+          border: "1px solid #3b3b3bff",
           borderRadius: "0.5rem",
           padding: "1rem",
-          backgroundColor: "#0f172a",
+          backgroundColor: "#404040ff",
           marginTop: "0.75rem"
         }}
       >

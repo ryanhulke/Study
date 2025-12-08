@@ -141,7 +141,7 @@ export async function generateCardsFromSource(params: {
 }
 
 
-export type PracticePool = 'due_recent' | 'all' | 'new_only';
+export type PracticePool = "due_recent" | "all" | "new_only";
 
 export interface PracticeCard {
   id: number;
@@ -150,25 +150,19 @@ export interface PracticeCard {
   back: string;
   source_id?: number | null;
   source_chunk_id?: number | null;
+  // backend will return extra fields (card_type, tags, etc.) which TS will ignore
 }
 
+// helper – matches style of other API functions
 export async function fetchPracticeCards(params: {
   deckId: number;
   pool: PracticePool;
-  limit?: number;
 }): Promise<PracticeCard[]> {
   const qs = new URLSearchParams({
     deck_id: String(params.deckId),
     pool: params.pool
   });
-  if (params.limit) {
-    qs.set("limit", String(params.limit));
-  }
 
-  const res = await fetch(`${API_BASE}/practice/cards?` + qs.toString());
-  if (!res.ok) {
-    throw new Error(`Failed to fetch practice cards: ${res.status}`);
-  }
-  return res.json();
+  const resp = await fetch(`${API_BASE}/practice_cards?${qs.toString()}`);
+  return handleResponse<PracticeCard[]>(resp);
 }
-

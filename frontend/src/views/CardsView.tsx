@@ -103,11 +103,11 @@ export const CardsView: React.FC = () => {
             <div
               key={c.id}
               style={{
-                border: "1px solid #1f2937",
+                border: "1px solid #3d3d3dff",
                 borderRadius: "0.5rem",
                 padding: "0.5rem 0.6rem",
                 marginBottom: "0.4rem",
-                backgroundColor: "#0f172a"
+                backgroundColor: "#404040ff"
               }}
             >
               <div
