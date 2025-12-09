@@ -166,3 +166,13 @@ export async function fetchPracticeCards(params: {
   const resp = await fetch(`${API_BASE}/practice_cards?${qs.toString()}`);
   return handleResponse<PracticeCard[]>(resp);
 }
+
+export async function deleteDeck(deckId: number): Promise<void> {
+  const resp = await fetch(`${API_BASE}/decks/${deckId}`, {
+    method: "DELETE"
+  });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`Failed to delete deck: ${text}`);
+  }
+}

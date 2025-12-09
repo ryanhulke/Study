@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { listDecks, listCards, deleteCard } from "../api";
+import { createDeck, deleteDeck, listDecks, listCards, deleteCard } from "../api";
 import type { Deck, Card } from "../types";
 
 export const CardsView: React.FC = () => {
@@ -9,6 +9,9 @@ export const CardsView: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [newDeckName, setNewDeckName] = useState("");
+  const [creatingDeck, setCreatingDeck] = useState(false);
+  const [deletingDeck, setDeletingDeck] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -57,30 +60,127 @@ export const CardsView: React.FC = () => {
       setError(`Failed to delete card: ${(e as Error).message}`);
     }
   }
+    async function handleCreateDeck() {
+    const name = newDeckName.trim();
+    if (!name) {
+      setError("Please enter a deck name.");
+      return;
+    }
 
+    setError(null);
+    setMessage(null);
+    setCreatingDeck(true);
+    try {
+      const deck = await createDeck(name);
+      setDecks((prev) => {
+        const updated = [...prev, deck].sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        return updated;
+      });
+      setSelectedDeckId(deck.id);
+      setNewDeckName("");
+      setMessage(`Created deck "${deck.name}".`);
+    } catch (e) {
+      setError(`Failed to create deck: ${(e as Error).message}`);
+    } finally {
+      setCreatingDeck(false);
+    }
+  }
+
+  async function handleDeleteDeck() {
+    if (selectedDeckId == null) {
+      setError("Please select a deck to delete.");
+      return;
+    }
+
+    const deckToDelete = decks.find((d) => d.id === selectedDeckId);
+    setError(null);
+    setMessage(null);
+    setDeletingDeck(true);
+    try {
+      await deleteDeck(selectedDeckId);
+      const filteredDecks = decks.filter((d) => d.id !== selectedDeckId);
+      setDecks(filteredDecks);
+      setSelectedDeckId(filteredDecks.length ? filteredDecks[0].id : null);
+      setCards([]);
+      if (deckToDelete) {
+        setMessage(`Deleted deck "${deckToDelete.name}".`);
+      } else {
+        setMessage(`Deleted deck ${selectedDeckId}.`);
+      }
+    } catch (e) {
+      setError(`Failed to delete deck: ${(e as Error).message}`);
+    } finally {
+      setDeletingDeck(false);
+    }
+  }
   return (
     <div className="card">
       <h2>Cards</h2>
-      <div style={{ marginBottom: "0.75rem" }}>
-        <label style={{ fontSize: "0.85rem" }}>
-          Deck{" "}
-          <select
-            className="select"
-            value={selectedDeckId ?? ""}
-            onChange={(e) =>
-              setSelectedDeckId(
-                e.target.value ? Number(e.target.value) : null
-              )
-            }
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "0.75rem",
+          marginBottom: "0.75rem"
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "flex-end", gap: "0.5rem" }}>
+          <label style={{ fontSize: "0.85rem" }}>
+            Deck{" "}
+            <select
+              className="select"
+              value={selectedDeckId ?? ""}
+              onChange={(e) =>
+                setSelectedDeckId(
+                  e.target.value ? Number(e.target.value) : null
+                )
+              }
+            >
+              <option value="">Select deck</option>
+              {decks.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            className="button small danger"
+            onClick={handleDeleteDeck}
+            disabled={selectedDeckId == null || deletingDeck}
           >
-            <option value="">Select deck</option>
-            {decks.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            {deletingDeck ? "Deleting..." : "Delete deck"}
+          </button>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            gap: "0.5rem"
+          }}
+        >
+          <label style={{ fontSize: "0.85rem" }}>
+            New deck
+            <input
+              type="text"
+              className="input"
+              placeholder="Deck name"
+              value={newDeckName}
+              onChange={(e) => setNewDeckName(e.target.value)}
+              style={{ marginTop: "0.25rem", minWidth: "12rem" }}
+            />
+          </label>
+          <button
+            className="button small"
+            onClick={handleCreateDeck}
+            disabled={creatingDeck}
+          >
+            {creatingDeck ? "Creating..." : "Create deck"}
+          </button>
+        </div>
       </div>
 
       {loading && <p>Loading cards...</p>}
