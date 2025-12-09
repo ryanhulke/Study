@@ -12,7 +12,7 @@ export const App: React.FC = () => {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <h1>Study</h1>
+        <h1>Study Wire</h1>
         <nav className="app-nav">
           <button
             className={tab === "review" ? "active" : ""}

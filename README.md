@@ -1,4 +1,4 @@
-# Study App
+# Study Wire
 The ultimate study tool.
 
 - automatically create flashcards from your notes or from your online textbook (pdf)
