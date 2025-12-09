@@ -8,11 +8,7 @@ from typing import List
 from sqlmodel import Session, select
 
 from .models import Source, SourceChunk
-
-try:
-    import fitz  # PyMuPDF  # type: ignore
-except ImportError:
-    fitz = None
+import fitz
 
 
 def compute_file_hash(path: Path) -> str:
@@ -93,11 +89,6 @@ def parse_markdown_to_chunks(path: Path) -> List[dict]:
 
 
 def parse_pdf_to_chunks(path: Path) -> List[dict]:
-    if fitz is None:
-        raise RuntimeError(
-            "PyMuPDF (fitz) is not installed. Install it with 'pip install pymupdf'."
-        )
-
     doc = fitz.open(path)  # type: ignore[attr-defined]
     chunks: List[dict] = []
     try:
@@ -179,9 +170,7 @@ def scan_notes_root(session: Session, notes_root: Path) -> int:
             session.commit()
 
             # Remove existing chunks
-            existing_chunks = session.exec(
-                select(SourceChunk).where(SourceChunk.source_id == src.id)
-            ).all()
+            existing_chunks = session.exec(select(SourceChunk).where(SourceChunk.source_id == src.id)).all()
             for ch in existing_chunks:
                 session.delete(ch)
             session.commit()

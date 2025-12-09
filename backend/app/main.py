@@ -36,7 +36,7 @@ app.add_middleware(
 logger = logging.getLogger(__name__)
 
 SCAN_INTERVAL_SECONDS = 300
-_notes_scan_task: Optional[asyncio.Task[None]] = None
+notes_scan_task: Optional[asyncio.Task[None]] = None
 
 
 async def scan_notes_once() -> None:
@@ -61,17 +61,16 @@ async def on_startup() -> None:
         ensure_default_deck(session)
     await scan_notes_once()
 
-    global _notes_scan_task
-    _notes_scan_task = asyncio.create_task(schedule_note_scans())
-
+    global notes_scan_task
+    notes_scan_task = asyncio.create_task(schedule_note_scans())
 
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
-    global _notes_scan_task
-    if _notes_scan_task is not None:
-        _notes_scan_task.cancel()
+    global notes_scan_task
+    if notes_scan_task is not None:
+        notes_scan_task.cancel()
         try:
-            await _notes_scan_task
+            await notes_scan_task
         except asyncio.CancelledError:
             pass
 
