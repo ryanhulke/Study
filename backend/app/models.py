@@ -10,12 +10,10 @@ class Source(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     path: str = Field(index=True, unique=True)
     title: str
-    type: str  # "markdown" or "pdf"
+    type: str
     hash: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-
-    # Use typing.List[...] here (NOT list[...] and NOT future annotations)
     chunks: List["SourceChunk"] = Relationship(back_populates="source")
     cards: List["Card"] = Relationship(back_populates="source")
 
@@ -25,8 +23,8 @@ class SourceChunk(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     source_id: int = Field(foreign_key="sources.id")
-    kind: str  # "markdown_section", "markdown_document", "pdf_page", etc.
-    loc: str   # e.g. heading text or "page=3"
+    kind: str
+    loc: str
     text: str
 
     source: Optional[Source] = Relationship(back_populates="chunks")
@@ -55,8 +53,8 @@ class Card(SQLModel, table=True):
 
     front: str
     back: str
-    card_type: str = "basic"  # e.g. "basic", "cloze"
-    tags: str = ""  # comma-separated tags
+    card_type: str = "basic"
+    tags: str = ""
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)

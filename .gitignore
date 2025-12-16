@@ -10,3 +10,4 @@ frontend/dist/
 backend.log
 llama.log
 notes.md
+backend/test.py

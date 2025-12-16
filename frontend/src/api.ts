@@ -151,10 +151,8 @@ export interface PracticeCard {
   back: string;
   source_id?: number | null;
   source_chunk_id?: number | null;
-  // backend will return extra fields (card_type, tags, etc.) which TS will ignore
 }
 
-// helper – matches style of other API functions
 export async function fetchPracticeCards(params: {
   deckId: number;
   pool: PracticePool;

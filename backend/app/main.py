@@ -1,11 +1,9 @@
 import asyncio
 import logging
 from typing import Optional
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session
-
 from .api.deps import ensure_default_deck
 from .api.routes import (
     cards,
@@ -26,7 +24,7 @@ app = FastAPI(title="Study Tool Backend")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten if you want
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -75,7 +73,6 @@ async def on_shutdown() -> None:
             pass
 
 
-# Include routers
 app.include_router(health.router)
 app.include_router(sources.router)
 app.include_router(search.router)

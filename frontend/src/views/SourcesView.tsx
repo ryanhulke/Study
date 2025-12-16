@@ -265,7 +265,7 @@ export const SourcesView: React.FC = () => {
       </p>
 
       <div className="split-layout" style={{ gap: "1.5rem", marginTop: "0.75rem" }}>
-        {/* LEFT COLUMN: Sources */}
+        {/* LEFT COLUMN: sources */}
         <div>
           <h3 style={{ marginTop: 0 }}>Sources</h3>
           <input
@@ -303,7 +303,7 @@ export const SourcesView: React.FC = () => {
 
         {/* RIGHT COLUMN */}
         <div>
-          {/* Selected source panel – only when something is selected */}
+          {/* selected source panel – only when something is selected */}
           <Collapse
             isOpen={panelOpen}
             durationMs={250}

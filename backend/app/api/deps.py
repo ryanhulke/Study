@@ -4,9 +4,6 @@ from ..models import Deck
 
 
 def ensure_default_deck(session: Session) -> Deck:
-    """
-    Ensure there is a 'Default' deck; create if missing.
-    """
     stmt = select(Deck).where(Deck.name == "Default")
     deck = session.exec(stmt).first()
     if deck is None:

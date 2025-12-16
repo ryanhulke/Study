@@ -33,17 +33,10 @@ def deduce_markdown_title(path: Path) -> str:
     return path.stem
 
 
-def deduce_pdf_title(path: Path) -> str:
-    # Simple: use file name; could extend to read metadata later
-    return path.stem
-
-
 def parse_markdown_to_chunks(path: Path) -> List[dict]:
     """
-    Simple markdown parser:
-    - Each heading (#, ##, ###, ...) starts a new chunk.
-    - Chunk text is all lines until the next heading.
-    - If no headings, whole file becomes one chunk.
+    - Each heading (#, ##, ###, ...) starts a new chunk
+    - If no headings, whole file becomes one chunk
     """
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
@@ -89,7 +82,7 @@ def parse_markdown_to_chunks(path: Path) -> List[dict]:
 
 
 def parse_pdf_to_chunks(path: Path) -> List[dict]:
-    doc = fitz.open(path)  # type: ignore[attr-defined]
+    doc = fitz.open(path)
     chunks: List[dict] = []
     try:
         for page_index in range(len(doc)):
@@ -133,16 +126,15 @@ def scan_notes_root(session: Session, notes_root: Path) -> int:
         src = session.exec(statement).first()
 
         if src is not None and src.hash == file_hash:
-            # No change; skip
             continue
 
         if src is None:
-            # New source
+            # new source
             if suffix == ".md":
                 title = deduce_markdown_title(path)
                 src_type = "markdown"
             else:
-                title = deduce_pdf_title(path)
+                title = path.stem
                 src_type = "pdf"
 
             src = Source(
@@ -157,25 +149,24 @@ def scan_notes_root(session: Session, notes_root: Path) -> int:
             session.commit()
             session.refresh(src)
         else:
-            # Existing source updated
             src.hash = file_hash
             src.updated_at = datetime.utcnow()
             if suffix == ".md":
                 src.title = deduce_markdown_title(path)
                 src.type = "markdown"
             else:
-                src.title = deduce_pdf_title(path)
+                src.title = path.stem
                 src.type = "pdf"
             session.add(src)
             session.commit()
 
-            # Remove existing chunks
+            # remove existing chunks
             existing_chunks = session.exec(select(SourceChunk).where(SourceChunk.source_id == src.id)).all()
             for ch in existing_chunks:
                 session.delete(ch)
             session.commit()
 
-        # Parse and add new chunks
+        # parse and add new chunks
         if suffix == ".md":
             chunk_dicts = parse_markdown_to_chunks(path)
         else:

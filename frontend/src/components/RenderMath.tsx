@@ -8,10 +8,7 @@ interface RenderMathProps {
   className?: string;
 }
 
-/**
- * RenderMath: renders plain text with LaTeX fragments like
- * \( ... \), \[ ... \], $...$, $$...$$ using KaTeX auto-render.
- */
+
 export const RenderMath: React.FC<RenderMathProps> = ({ text, className }) => {
   const ref = useRef<HTMLDivElement | null>(null);
 

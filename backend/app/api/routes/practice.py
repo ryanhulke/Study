@@ -32,9 +32,8 @@ def get_practice_cards(
 
     today = date.today()
 
-    # Decide query based on pool
     if pool == PracticePool.DUE_RECENT:
-        # Cards that are due now or within the next 3 days
+        # cards that are due now or within the next 3 days
         stmt = (
             select(Card)
             .join(SchedulingState, SchedulingState.card_id == Card.id)
@@ -62,8 +61,7 @@ def get_practice_cards(
             )
         )
 
-    else:  # PracticePool.ALL
-        # All cards in deck, regardless of scheduling info
+    else:
         stmt = select(Card).where(Card.deck_id == deck_id)
 
     cards = session.exec(stmt).all()

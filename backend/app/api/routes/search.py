@@ -16,9 +16,6 @@ def search_chunks(
     limit: int = Query(20, ge=1, le=100),
     session: Session = Depends(get_session),
 ) -> List[SourceChunkRead]:
-    """
-    Simple text search over chunk text; case-sensitive contains search.
-    """
     try:
         statement = (
             select(SourceChunk)

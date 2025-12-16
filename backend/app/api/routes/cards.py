@@ -207,13 +207,13 @@ def delete_card(
     if card is None:
         raise HTTPException(status_code=404, detail="Card not found")
 
-    # Delete scheduling state
+    # delete scheduling state
     stmt = select(SchedulingState).where(SchedulingState.card_id == card.id)
     sched = session.exec(stmt).first()
     if sched is not None:
         session.delete(sched)
 
-    # Delete review logs
+    # delete review logs
     rev_stmt = select(ReviewLog).where(ReviewLog.card_id == card.id)
     revs = session.exec(rev_stmt).all()
     for r in revs:
